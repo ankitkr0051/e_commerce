@@ -3,7 +3,7 @@ import productsData from '../data/products.json';
 import "./Home.css"
 
 const Home = () => {
-  const featuredProducts = productsData.products.slice(0, 3);
+ 
 
   return (
     <div className="home">

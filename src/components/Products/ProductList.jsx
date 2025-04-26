@@ -1,26 +1,36 @@
-
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
-import productsData from '../../data/products.json';
+import { useProducts } from '../../context/ProductContext';
 import './ProductList.css';
 
 const ProductList = () => {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const { products, categories, getProductsByCategory, searchProducts } = useProducts();
   const { addToCart } = useCart();
 
-  useEffect(() => {
-    setProducts(productsData.products);
-    setFilteredProducts(productsData.products);
-  }, []);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Generate search suggestions
+  useEffect(() => {
+    let result = products;
+
+    if (selectedCategory !== 'All') {
+      result = getProductsByCategory(selectedCategory);
+    }
+
+    if (searchTerm) {
+      result = searchProducts(searchTerm).filter(p =>
+        selectedCategory === 'All' || p.category === selectedCategory
+      );
+    }
+
+    setFilteredProducts(result);
+  }, [searchTerm, selectedCategory, products, getProductsByCategory, searchProducts]);
+
+  // Generate suggestions when searchTerm changes
   useEffect(() => {
     if (searchTerm.trim() === '') {
       setSuggestions([]);
@@ -28,33 +38,19 @@ const ProductList = () => {
     }
 
     const timer = setTimeout(() => {
-      const matchedProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()))
-        .slice(0, 5); // Show max 5 suggestions
+      const matchedProducts = products
+        .filter(product => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        .slice(0, 5); // Max 5 suggestions
+
       setSuggestions(matchedProducts);
     }, 300);
 
     return () => clearTimeout(timer);
   }, [searchTerm, products]);
 
-  useEffect(() => {
-    let result = products;
-    if (searchTerm) {
-      result = result.filter(p => 
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    }
-    if (selectedCategory !== 'All') {
-      result = result.filter(p => p.category === selectedCategory);
-    }
-    setFilteredProducts(result);
-  }, [searchTerm, selectedCategory, products]);
-
-  const categories = ['All', ...new Set(products.map(p => p.category))];
-
   const handleSuggestionClick = (product) => {
     setSearchTerm(product.name);
     setShowSuggestions(false);
-    // Optional: Auto-filter when suggestion is clicked
     setFilteredProducts([product]);
   };
 
@@ -74,11 +70,12 @@ const ProductList = () => {
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             className="search-input"
           />
+
           {showSuggestions && suggestions.length > 0 && (
             <div className="suggestions-dropdown">
               {suggestions.map(product => (
-                <div 
-                  key={product.id} 
+                <div
+                  key={product.id}
                   className="suggestion-item"
                   onClick={() => handleSuggestionClick(product)}
                 >
@@ -88,6 +85,7 @@ const ProductList = () => {
             </div>
           )}
         </div>
+
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
@@ -98,31 +96,46 @@ const ProductList = () => {
           ))}
         </select>
       </div>
+
       <div className="products">
         {filteredProducts.map(product => (
           <div key={product.id} className="product-card">
-            <img src={product.image} alt={product.name} />
+            <img
+              src={product.image}
+              alt={product.name}
+              onError={(e) => e.target.src = ''}
+            />
             <div className="product-info">
               <h3>{product.name}</h3>
               <p className="price">${product.price.toFixed(2)}</p>
+              <p className="category">{product.category}</p>
             </div>
             <div className="product-actions">
-              <button 
-                onClick={() => addToCart(product.id, 1)} 
+              <button
+                onClick={() => addToCart(product.id, 1)}
                 className="add-to-cart-btn"
+                disabled={product.stock <= 0}
               >
-                Add to Cart
+                {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
               </button>
-              <Link 
-                to={`/products/${product.id}`} 
+              <Link
+                to={`/products/${product.id}`}
                 className="details-link"
               >
-                Product details
+                View Details
               </Link>
             </div>
           </div>
         ))}
       </div>
+
+      {filteredProducts.length === 0 && (
+        <div className="no-products">
+          {searchTerm || selectedCategory !== 'All'
+            ? 'No products match your criteria'
+            : 'No products available'}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,76 +1,118 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import productsData from '../data/products.json';
+import productsData from '../data/products.json'; 
 
 const ProductContext = createContext();
 
+// Helper functions for localStorage
+const getLocalStorageProducts = () => {
+  try {
+    const storedProducts = localStorage.getItem('products');
+    return storedProducts ? JSON.parse(storedProducts) : null;
+  } catch (error) {
+    console.error('Error reading from localStorage:', error);
+    return null;
+  }
+};
+
+const setLocalStorageProducts = (products) => {
+  try {
+    localStorage.setItem('products', JSON.stringify(products));
+  } catch (error) {
+    console.error('Error saving to localStorage:', error);
+  }
+};
+
 export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [categories, setCategories] = useState(['All']);
 
-  // Load products and categories on component mount
-  useEffect(() => {
+  // Load products from JSON file or localStorage
+  const loadProducts = async () => {
     try {
-      // In a real app, this would be an API call
-      setProducts(productsData.products);
+      setLoading(true);
+      setError(null);
       
-      // Extract unique categories
-      const uniqueCategories = ['All', ...new Set(
-        productsData.products.map(product => product.category)
-      )];
-      setCategories(uniqueCategories);
+      // 1. Try to load from localStorage first
+      const storedProducts = getLocalStorageProducts();
       
-      setLoading(false);
+      if (storedProducts && storedProducts.length > 0) {
+        setProducts(storedProducts);
+        updateCategories(storedProducts);
+      } else {
+        // 2. Fallback to JSON file data
+        // Note: In a real app, this would be an API call
+        const jsonProducts = productsData.products;
+        setProducts(jsonProducts);
+        setLocalStorageProducts(jsonProducts);
+        updateCategories(jsonProducts);
+      }
     } catch (err) {
       setError('Failed to load products');
+      console.error('Error loading products:', err);
+    } finally {
       setLoading(false);
     }
+  };
+
+  // Update categories whenever products change
+  const updateCategories = (productsList) => {
+    const uniqueCategories = [...new Set(productsList.map(p => p.category))];
+    setCategories(['All', ...uniqueCategories]);
+  };
+
+  // Initial load
+  useEffect(() => {
+    loadProducts();
   }, []);
 
-  // Get product by ID
+  // Save to localStorage when products change
+  useEffect(() => {
+    if (products.length > 0) {
+      setLocalStorageProducts(products);
+      updateCategories(products);
+    }
+  }, [products]);
+
+  const addProduct = (product) => {
+    const newProduct = {
+      ...product,
+      id: `product${Date.now()}`,
+      price: parseFloat(product.price),
+      stock: parseInt(product.stock)
+    };
+    const updatedProducts = [...products, newProduct];
+    setProducts(updatedProducts);
+    return newProduct;
+  };
+
+  const deleteProduct = (id) => {
+    const updatedProducts = products.filter(product => product.id !== id);
+    setProducts(updatedProducts);
+  };
+
   const getProductById = (id) => {
     return products.find(product => product.id === id);
   };
 
-  // Filter products by category
-  const getProductsByCategory = (category) => {
-    if (category === 'All') return products;
-    return products.filter(product => product.category === category);
-  };
-
-  // Search products
   const searchProducts = (query) => {
+    if (!query) return products;
     return products.filter(product =>
       product.name.toLowerCase().includes(query.toLowerCase()) ||
       product.description.toLowerCase().includes(query.toLowerCase())
     );
   };
 
-  // Add new product (admin only)
-  const addProduct = (newProduct) => {
-    const productWithId = {
-      ...newProduct,
-      id: `product${products.length + 1}`,
-    };
-    setProducts(prev => [...prev, productWithId]);
-    // In a real app, update the backend here
+  const getProductsByCategory = (category) => {
+    if (category === 'All') return products;
+    return products.filter(product => product.category === category);
   };
 
-  // Update product (admin only)
-  const updateProduct = (id, updatedProduct) => {
-    setProducts(prev =>
-      prev.map(product =>
-        product.id === id ? { ...product, ...updatedProduct } : product
-      )
-    );
-    // In a real app, update the backend here
-  };
-
-  // Delete product (admin only)
-  const deleteProduct = (id) => {
-    setProducts(prev => prev.filter(product => product.id !== id));
-    // In a real app, update the backend here
+  // Optional: Reset to original JSON data
+  const resetProducts = () => {
+    setProducts(productsData.products);
+    setLocalStorageProducts(productsData.products);
   };
 
   return (
@@ -80,12 +122,13 @@ export const ProductProvider = ({ children }) => {
         categories,
         loading,
         error,
-        getProductById,
-        getProductsByCategory,
-        searchProducts,
         addProduct,
-        updateProduct,
         deleteProduct,
+        getProductById,
+        searchProducts,
+        getProductsByCategory,
+        resetProducts,
+        reloadProducts: loadProducts // Add reload capability
       }}
     >
       {children}

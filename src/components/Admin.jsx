@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import productsData from '../data/products.json';
+import { useProducts } from '../context/ProductContext';
+import { useAuth } from '../context/AuthContext';
 import './Admin.css';
 
 const Admin = () => {
+  const { user } = useAuth();
+  const { 
+    products, 
+    categories, 
+    addProduct, 
+    deleteProduct, 
+    searchProducts 
+  } = useProducts();
+  
   const [activeTab, setActiveTab] = useState('add');
-  const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -17,27 +26,6 @@ const Admin = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  useEffect(() => {
-    setProducts(productsData.products);
-  }, []);
-
-  useEffect(() => {
-    if (searchTerm.trim() === '') {
-      setSuggestions([]);
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      const matchedProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase())
-      ).slice(0, 5); // Max 5 suggestions
-      setSuggestions(matchedProducts);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm, products]);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -46,21 +34,10 @@ const Admin = () => {
   const handleAddProduct = (e) => {
     e.preventDefault();
     if (!formData.name || !formData.price || !formData.stock) {
-      alert('Please fill in all required fields');
+      alert('Please fill required fields');
       return;
     }
-
-    const newProduct = {
-      id: `product${Date.now()}`,
-      name: formData.name,
-      price: parseFloat(formData.price),
-      description: formData.description,
-      category: formData.category,
-      image: formData.image || '/images/default-product.jpg',
-      stock: parseInt(formData.stock)
-    };
-
-    setProducts(prev => [...prev, newProduct]);
+    addProduct(formData);
     setFormData({
       name: '',
       price: '',
@@ -69,19 +46,26 @@ const Admin = () => {
       image: '',
       stock: ''
     });
-    alert('Product added successfully!');
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      setProducts(products.filter(product => product.id !== id));
+  const filteredProducts = searchProducts(searchTerm);
+
+  // Generate search suggestions
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setSuggestions([]);
+      return;
     }
-  };
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    const timer = setTimeout(() => {
+      const matchedProducts = products
+        .filter(product => product.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        .slice(0, 5); // Show max 5 suggestions
+      setSuggestions(matchedProducts);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, products]);
 
   const handleSuggestionClick = (product) => {
     setSearchTerm(product.name);
@@ -112,12 +96,10 @@ const Admin = () => {
         {activeTab === 'add' && (
           <form onSubmit={handleAddProduct} className="product-form">
             <h2>Add New Product</h2>
-
             <div className="form-group">
               <label>Product Name *</label>
               <input type="text" name="name" value={formData.name} onChange={handleInputChange} required />
             </div>
-
             <div className="form-row">
               <div className="form-group">
                 <label>Price *</label>
@@ -130,23 +112,20 @@ const Admin = () => {
               <div className="form-group">
                 <label>Category</label>
                 <select name="category" value={formData.category} onChange={handleInputChange}>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Home">Home</option>
-                  <option value="Clothing">Clothing</option>
+                  {categories.filter(c => c !== 'All').map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
                 </select>
               </div>
             </div>
-
             <div className="form-group">
               <label>Description</label>
               <textarea name="description" value={formData.description} onChange={handleInputChange} rows="3" />
             </div>
-
             <div className="form-group">
               <label>Image URL</label>
               <input type="text" name="image" value={formData.image} onChange={handleInputChange} />
             </div>
-
             <button type="submit" className="submit-btn">Add Product</button>
           </form>
         )}
@@ -165,6 +144,7 @@ const Admin = () => {
                 onFocus={() => setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
               />
+
               {showSuggestions && suggestions.length > 0 && (
                 <div className="suggestions-dropdown">
                   {suggestions.map(product => (
@@ -195,7 +175,7 @@ const Admin = () => {
                   {filteredProducts.map(product => (
                     <tr key={product.id}>
                       <td className="product-info">
-                        <img src={product.image} alt={product.name} onError={(e) => (e.target.src = '/images/default-product.jpg')} />
+                        <img src={product.image} alt={product.name} />
                         <div>
                           <strong>{product.name}</strong>
                           <p>{product.description}</p>
@@ -205,14 +185,21 @@ const Admin = () => {
                       <td className={product.stock < 10 ? 'low-stock' : ''}>{product.stock}</td>
                       <td>{product.category}</td>
                       <td>
-                        <button className="delete-btn" onClick={() => handleDelete(product.id)}>Delete</button>
+                        <button 
+                          className="delete-btn" 
+                          onClick={() => deleteProduct(product.id)}
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             ) : (
-              <p className="no-products">{searchTerm ? `No products matching "${searchTerm}"` : 'No products available.'}</p>
+              <p className="no-products">
+                {searchTerm ? `No products matching "${searchTerm}"` : 'No products available'}
+              </p>
             )}
           </div>
         )}
