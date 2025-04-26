@@ -1,0 +1,49 @@
+{
+    "products": [
+      {
+        "id": "product1",
+        "name": "Wireless Headphones",
+        "price": 99.99,
+        "description": "High-quality wireless headphones with noise cancellation",
+        "category": "Electronics",
+        "image": "/images/headphones.jpg",
+        "stock": 50
+      },
+      {
+        "id": "product2",
+        "name": "Smart Watch",
+        "price": 199.99,
+        "description": "Feature-rich smartwatch with health monitoring",
+        "category": "Electronics",
+        "image": "/images/smartwatch.jpg",
+        "stock": 30
+      },
+      {
+        "id": "product3",
+        "name": "Wireless Headphones",
+        "price": 99.99,
+        "description": "High-quality wireless headphones with noise cancellation",
+        "category": "Electronics",
+        "image": "/images/headphones.jpg",
+        "stock": 50
+      },
+      {
+        "id": "product4",
+        "name": "Sssssssssssssmart Watch",
+        "price": 199.99,
+        "description": "Feature-rich smartwatch with health monitoring",
+        "category": "Electronics",
+        "image": "/images/smartwatch.jpg",
+        "stock": 30
+      },
+      {
+        "id": "product5",
+        "name": "Smart wwWatch",
+        "price": 199.99,
+        "description": "Feature-rich smartwatch with health monitoring",
+        "category": "Electronics",
+        "image": "/images/smartwatch.jpg",
+        "stock": 30
+      }
+    ]
+  }

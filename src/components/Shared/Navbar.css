@@ -1,0 +1,281 @@
+.navbar {
+  width: 100%;
+  background-color: #7D141D;
+  color: white;
+  padding: 1rem 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
+  gap: 1rem;
+}
+
+/* Brand Logo - Left Corner */
+.nav-brand {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.logo-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #F4EFEA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* Ensures the image stays within the circle */
+  border: 2px solid #F4EFEA; /* Optional: adds a border */
+}
+
+.brand-logo {
+  width: 100%; /* Makes image fill the container */
+  height: 100%; /* Makes image fill the container */
+  object-fit: cover; /* Ensures image covers the space while maintaining aspect ratio */
+  object-position: center; /* Centers the image */
+}
+
+.nav-brand span {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #F4EFEA;
+  font-family: 'Arial', sans-serif;
+  letter-spacing: 1px;
+  transition: color 0.3s ease;
+}
+
+.nav-brand:hover span {
+  color: white;
+}
+
+/* Middle Navigation Links */
+.nav-middle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-grow: 1;
+  padding: 0 2rem;
+}
+
+.nav-middle a {
+  color: #F4EFEA;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  position: relative;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.nav-middle a:hover {
+  color: white;
+}
+
+.nav-middle a::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #F4EFEA;
+  transition: width 0.3s ease;
+}
+
+.nav-middle a:hover::after {
+  width: 100%;
+}
+
+.cart-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cart-count {
+  position: absolute;
+  top: -10px;
+  right: -15px;
+  background-color: #F4EFEA;
+  color: #7D141D;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+/* Right Corner - User Section */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-shrink: 0;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.profile-photo {
+  width: 36px;
+  height: 36px;
+  background-color: #F4EFEA;
+  color: #7d121e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.welcome-msg {
+  font-size: 0.95rem;
+  color: #F4EFEA;
+  white-space: nowrap;
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #F4EFEA;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.login-btn:hover {
+  color: white;
+}
+
+.login-btn .profile-photo {
+  width: 32px;
+  height: 32px;
+  background-color: transparent;
+}
+
+.logout-btn {
+  background-color: transparent;
+  border: 1px solid #F4EFEA;
+  color: #F4EFEA;
+  padding: 0.5rem 1.25rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.logout-btn:hover {
+  background-color: rgba(244, 239, 234, 0.1);
+  border-color: white;
+  color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .navbar-container {
+    padding: 0 1.5rem;
+  }
+  
+  .nav-middle {
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-container {
+    flex-wrap: wrap;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .nav-brand {
+    order: 1;
+    margin-right: auto;
+  }
+
+  .nav-right {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .nav-middle {
+    order: 3;
+    width: 100%;
+    justify-content: space-around;
+    padding: 1rem 0 0 0;
+    border-top: 1px solid rgba(244, 239, 234, 0.2);
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-middle {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-middle a {
+    font-size: 0.9rem;
+  }
+
+  .nav-brand span {
+    font-size: 1.5rem;
+  }
+
+  .logo-circle {
+    width: 35px;
+    height: 35px;
+  }
+ 
+
+  .brand-logo {
+    height: 20px;
+  }
+
+  .nav-right {
+    gap: 1rem;
+  }
+
+  .logout-btn {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .profile-photo {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+
+  .welcome-msg {
+    font-size: 0.85rem;
+  }
+}

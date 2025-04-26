@@ -1,0 +1,32 @@
+{
+    "orders": [
+      {
+        "id": "order1",
+        "userId": "user1",
+        "orderDate": "2023-11-01T10:00:00Z",
+        "status": "Processing",
+        "items": [
+          {
+            "productId": "product1",
+            "quantity": 2,
+            "price": 99.99
+          }
+        ],
+        "totalAmount": 199.98
+      },
+      {
+        "id": "order1",
+        "userId": "user1",
+        "orderDate": "2023-11-01T10:00:00Z",
+        "status": "Processing",
+        "items": [
+          {
+            "productId": "product1",
+            "quantity": 2,
+            "price": 99.99
+          }
+        ],
+        "totalAmount": 199.98
+      }
+    ]
+  }

@@ -1,0 +1,143 @@
+/* Main Container */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  background-color: #F4EFEA;
+  padding: 1rem;
+}
+
+/* Form Styling */
+.login-form {
+  width: 100%;
+  max-width: 380px;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(125, 20, 29, 0.1);
+  box-sizing: border-box;
+}
+
+.login-form h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #7D141D;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 1.25rem;
+  width: 100%;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #7D141D;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid rgba(125, 20, 29, 0.2);
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #F4EFEA;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  display: block;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #7D141D;
+  box-shadow: 0 0 0 2px rgba(125, 20, 29, 0.1);
+}
+
+/* Button */
+.submit-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #7D141D;
+  color: #F4EFEA;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+  box-sizing: border-box;
+}
+
+.submit-button:hover {
+  background-color: #5a0f16;
+  transform: translateY(-1px);
+}
+
+.submit-button:active {
+  transform: translateY(0);
+}
+
+.submit-button:disabled {
+  background-color: rgba(125, 20, 29, 0.5);
+  cursor: not-allowed;
+}
+
+/* Error Message */
+.error-message {
+  color: #d32f2f;
+  background-color: rgba(211, 47, 47, 0.1);
+  padding: 0.8rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  border: 1px solid rgba(211, 47, 47, 0.2);
+  box-sizing: border-box;
+}
+
+/* Auth Links */
+.auth-redirect {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #F4EFEA;
+  font-size: 0.95rem;
+}
+
+.auth-link {
+  color: #7D141D;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.auth-link:hover {
+  color: #F4EFEA;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .login-form {
+    padding: 1.5rem;
+    box-shadow: none;
+    border: 1px solid rgba(125, 20, 29, 0.1);
+  }
+
+  .login-form h2 {
+    font-size: 1.3rem;
+  }
+
+  .form-input {
+    padding: 0.65rem;
+  }
+
+  .submit-button {
+    padding: 0.65rem;
+  }
+}
