@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import usersData from '../../data/users.json';
 import "./Register.css";
 
 const Register = () => {
@@ -11,42 +10,36 @@ const Register = () => {
   const [role, setRole] = useState('customer');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+
+  const { users, register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    
-    try {
-      const userExists = usersData.users.some(user => user.email === email);
-      if (userExists) {
-        setError('Email already registered');
-        return;
-      }
 
-      const newUser = {
-        id: `user${usersData.users.length + 1}`,
-        name,
-        email,
-        password,
-        role
-      };
-
-      usersData.users.push(newUser);
-      
-      login(email, password);
-      if (role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
-    } catch (err) {
-      setError('Failed to register');
-    } finally {
+    if (users.some(user => user.email === email)) {
+      setError('Email already registered');
       setIsLoading(false);
+      return;
     }
+
+    const result = register({
+      id: `user${users.length + 1}`,
+      name,
+      email,
+      password,
+      role
+    });
+
+    if (result.success) {
+      navigate(role === 'admin' ? '/admin' : '/');
+    } else {
+      setError('Registration failed');
+    }
+    
+    setIsLoading(false);
   };
 
   return (
@@ -91,14 +84,13 @@ const Register = () => {
               className="form-select"
               value={role}
               onChange={(e) => setRole(e.target.value)}
-              required
             >
               <option value="customer">Customer</option>
               <option value="admin">Admin</option>
             </select>
           </div>
           <button 
-            type="submit" 
+            type="submit"
             className="submit-button"
             disabled={isLoading}
           >
